@@ -1,0 +1,68 @@
+<meta charset="utf-8">
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+  <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+  crossorigin="anonymous">
+<script>
+
+function addBoardHeader(item) {
+    var boardHeader = "<tr>";
+
+    for (key in item) {
+      if (key == 'url') {
+        continue;
+      }
+      boardHeader += "<th>" + key + "</th>";
+    }
+    boardHeader += "</tr>"
+    return boardHeader;
+}
+
+function addBoadItem(item) {
+  var boardItem = "<tr>";
+
+  for (key in item) {
+    if (key == 'url') {
+      continue;
+    }
+    boardItem += "<td>" + item[key] + "</td>";
+  }
+  boardItem += "</tr>";
+  return boardItem;
+}
+
+$(document).ready(function(){
+  $.ajax({
+    type: "GET",
+    url:  "/api/postings",
+    async: true,
+    success : function(data) {
+      var postings = data['results'];
+      console.log(postings)
+      if (postings.length > 0) {
+        $('#board_list').append(addBoardHeader(postings[0]))
+        for (var i = 0, item; item=postings[i]; i++) {
+          console.log(postings[i])
+          $('#board_list').append(addBoadItem(postings[i]))
+        }
+      }
+    }
+  })
+})
+</script>
+<title> DJANGO REST 게시판 </title>
+<center><h1> DJANGO REST 게시판 </h1></center>
+</head>
+  <center>
+  <div style="width:500px;">
+    <table id="board_list" class="table table-striped">
+    <!-- 게시판 목록이 표시될 곳!!-->
+  </table>
+  <button type="button" class="btn btn-success">글쓰기</button>
+  </div>
+  </center>
+
+</html>
