@@ -123,12 +123,18 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
     ],
-    'PAGE_SIZE': 10,
+    'DATETIME_FORMAT': "%Y-%m-%d %H:%M",
+    'PAGE_SIZE': 5,
 }
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "static"),
+)

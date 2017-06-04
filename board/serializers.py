@@ -15,4 +15,4 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class PostringDetailSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Posting
-        fields = ('name', 'title', 'text', 'create_date', 'modified_date')
+        fields = ('title', 'create_date', 'name', 'text')

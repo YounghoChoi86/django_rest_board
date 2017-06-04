@@ -1,68 +1,51 @@
 <meta charset="utf-8">
 <html>
 <head>
+  {% load staticfiles %}
   <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
   <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-  crossorigin="anonymous">
-<script>
+  <script src='{%static "board/js/board.js" %}'></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+  integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
 
-function addBoardHeader(item) {
-    var boardHeader = "<tr>";
 
-    for (key in item) {
-      if (key == 'url') {
-        continue;
-      }
-      boardHeader += "<th>" + key + "</th>";
-    }
-    boardHeader += "</tr>"
-    return boardHeader;
-}
-
-function addBoadItem(item) {
-  var boardItem = "<tr>";
-
-  for (key in item) {
-    if (key == 'url') {
-      continue;
-    }
-    boardItem += "<td>" + item[key] + "</td>";
-  }
-  boardItem += "</tr>";
-  return boardItem;
-}
-
-$(document).ready(function(){
-  $.ajax({
-    type: "GET",
-    url:  "/api/postings",
-    async: true,
-    success : function(data) {
-      var postings = data['results'];
-      console.log(postings)
-      if (postings.length > 0) {
-        $('#board_list').append(addBoardHeader(postings[0]))
-        for (var i = 0, item; item=postings[i]; i++) {
-          console.log(postings[i])
-          $('#board_list').append(addBoadItem(postings[i]))
-        }
-      }
-    }
-  })
-})
-</script>
-<title> DJANGO REST 게시판 </title>
-<center><h1> DJANGO REST 게시판 </h1></center>
+<title> 취미 코딩 게시판 </title>
 </head>
+<div class="pos-f-t">
+<div class="collapse" id="navbarToggleExternalContent">
+  <div class="bg-inverse p-4">
+    <h4 class="text-white"><a href='/board'>게시판</a></h4>
+  </div>
+</div>
+<nav class="navbar navbar-inverse bg-inverse">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+</div>
+
   <center>
-  <div style="width:500px;">
-    <table id="board_list" class="table table-striped">
+  <div id='posting-detail' style="width:50%">
+  </div>
+
+  <div style="width:70%;">
+    <table id="board-list" class="table table-inverse">
     <!-- 게시판 목록이 표시될 곳!!-->
   </table>
-  <button type="button" class="btn btn-success">글쓰기</button>
+  </div>
+
+  <div align='right' style='width:70%;'>
+    <button class="btn btn-primary">글작성</button>
+  </div>
+  <div>
+  <ul id="page" class="pagination justify-content-center">
+      <!-- pageNation area -->
+  </ul>
   </div>
   </center>
-
+  <script type="text/javascript">
+  $(document).ready(getPostings(1, true), makePageNation(0))
+  </script>
 </html>

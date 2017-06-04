@@ -16,7 +16,9 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework import routers
+from django.conf.urls.static import static
 from board import views as board_views #PostingViewSet, CommentViewSet, posting_comments
+from mysite import settings
 
 
 router = routers.DefaultRouter()
@@ -24,10 +26,11 @@ router.register(r'postings', board_views.PostingViewSet)
 router.register(r'comments', board_views.CommentViewSet)
 
 urlpatterns = [
+    url(r'^api/postings/count/$', board_views.postings_pagecount),
     url(r'^api/postings/(?P<pk>\d+)/$', board_views.posting_detail),
     url(r'^api/postings/(?P<pk>\d+)/comments/$', board_views.posting_comments),
     url(r'^api/', include(router.urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^board/$', board_views.BoardView.as_view()),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

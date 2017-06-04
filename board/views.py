@@ -6,6 +6,11 @@ from .models import Posting, Comment
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
+import mysite.settings
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework import permissions
 
 # Create your views here.
 
@@ -22,7 +27,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 @csrf_exempt
 def posting_detail(request, pk):
-    print('posting detail function !!')
+    #print('posting detail function !!')
     try:
         posting = Posting.objects.get(pk=pk)
     except Posting.DoesNotExist:
@@ -46,3 +51,13 @@ def posting_comments(request, pk):
     if (request.method == 'GET'):
         serializer = CommentSerializer(comments, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+
+@api_view(('GET',))
+@permission_classes((permissions.AllowAny,))
+@renderer_classes((JSONRenderer,))
+def postings_pagecount(request):
+    pageCount = Posting.objects.count()
+    print(pageCount)
+    data = { 'count': pageCount, 'postingPerPage': mysite.settings.REST_FRAMEWORK['PAGE_SIZE']}
+    return Response(data);
