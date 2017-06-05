@@ -1,4 +1,4 @@
-var restKeyToKoreaMap = {
+var restKeyToKoreanMap = {
   "name" : "작성자",
   "title" : "제목",
   "text" : "내용",
@@ -12,7 +12,7 @@ function addBoardHeader(item) {
         //console.log(key)
         continue;
       }
-      boardHeader += "<th>" + restKeyToKoreaMap[key] + "</th>";
+      boardHeader += "<th>" + restKeyToKoreanMap[key] + "</th>";
     }
     boardHeader += "</tr>"
     return boardHeader;
@@ -42,7 +42,7 @@ function makePostingDetailTable(posting, id) {
   var tableTag = "<table class='table table-hover'>"
   if (posting) {
     for (key in posting) {
-      tableTag += '<tr><td>' + restKeyToKoreaMap[key] + '</td><td>' + posting[key] + '</td></tr>';
+      tableTag += '<tr><td>' + restKeyToKoreanMap[key] + '</td><td>' + posting[key] + '</td></tr>';
     }
   }
   tableTag += '</table>'

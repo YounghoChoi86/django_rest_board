@@ -6,13 +6,15 @@ from .models import Posting, Comment
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
-import mysite.settings
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework import permissions
 from django.forms.models import model_to_dict
 from django.db import IntegrityError
+from collections import OrderedDict
+from .utils import dict_to_OreredDict
+import mysite
 # Create your views here.
 
 class BoardView(TemplateView):
@@ -31,7 +33,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 @csrf_exempt
 @renderer_classes((JSONRenderer,))
 def posting_with_pk(request, pk):
-    print('posting detail function !!')
+    #print('posting detail function !!')
     if (request.method == 'GET'):
         try:
             posting = Posting.objects.get(pk=pk)
@@ -68,37 +70,37 @@ def posting_comments(request, pk):
 @csrf_exempt
 @renderer_classes((JSONRenderer,))
 def posting_rest(request):
-    #pageCount = Posting.objects.count()
-    print('posting_rest')
     if (request.method == 'GET'):
         index = 0; pagesize = mysite.settings.REST_FRAMEWORK['PAGE_SIZE']; start = 0;
-        try:
-            index = int(request.GET.urlencode().split('=')[1])
-        except IndexError:
-            pass
-        else:
-            pagesize = mysite.settings.REST_FRAMEWORK['PAGE_SIZE']
-            start = ((index - 1) * pagesize)
+        if (request.GET.urlencode()):
+            try:
+                query_string = request.GET.urlencode().split('=')
+                if (query_string[0] == 'page'):
+                    index = int(query_string[1])
+            except (IndexError , ValueError) as e:
+                pass
+            else:
+                pagesize = mysite.settings.REST_FRAMEWORK['PAGE_SIZE']
+                start = ((index - 1) * pagesize)
 
         postings = Posting.objects.all()[start:start + pagesize]
-        # TODO Exception Handling
+        if len(postings) == 0:
+            return Response(None , 404)
         postinglist = []
-        fields_order = ['id', 'title', 'name', 'create_date',];
+        response_fields = ['id', 'title', 'name', 'create_date',]
+        fields_ordering = ['id', 'title', 'name', 'create_date', 'comment_count', 'url']
         for posting in postings:
             postingdict = model_to_dict(posting, \
-                fields=fields_order)
-            new_dic = {}
-            for field in fields_order:
-                new_dic[field] = postingdict[field];
-            #print(new_dic)
-            posting_dict = new_dic
+                fields=response_fields)
             postingdict['create_date'] = postingdict['create_date'].strftime('%Y-%m-%d %H:%M')
             comment_count = posting.comment_set.count()
             postingdict['comment_count'] = comment_count
             postingdict['url'] = '/api/postings/' + str(postingdict['id'])
-            postinglist.append(postingdict)
-
+            #ordering keyword for response
+            orderedDict = dict_to_OreredDict(postingdict, fields_ordering)
+            postinglist.append(orderedDict)
         return Response({'results' : postinglist})
+
     if (request.method == 'POST'):
         data= request.data
         try:
@@ -112,6 +114,6 @@ def posting_rest(request):
 @renderer_classes((JSONRenderer,))
 def postings_pagecount(request):
     pageCount = Posting.objects.count()
-    print(pageCount)
+    #print(pageCount)
     data = { 'count': pageCount, 'postingPerPage': mysite.settings.REST_FRAMEWORK['PAGE_SIZE']}
     return Response(data);
