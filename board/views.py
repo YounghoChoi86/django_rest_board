@@ -11,7 +11,8 @@ from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
 from rest_framework.decorators import api_view, renderer_classes, permission_classes
 from rest_framework import permissions
-
+from django.forms.models import model_to_dict
+from django.db import IntegrityError
 # Create your views here.
 
 class BoardView(TemplateView):
@@ -25,17 +26,26 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+@api_view(('GET', 'DELETE',)) # method not
+@permission_classes((permissions.AllowAny,))
 @csrf_exempt
-def posting_detail(request, pk):
-    #print('posting detail function !!')
-    try:
-        posting = Posting.objects.get(pk=pk)
-    except Posting.DoesNotExist:
-        return HttpResponse(status=404)
-
+@renderer_classes((JSONRenderer,))
+def posting_with_pk(request, pk):
+    print('posting detail function !!')
     if (request.method == 'GET'):
+        try:
+            posting = Posting.objects.get(pk=pk)
+        except Posting.DoesNotExist:
+            return Response(None, status=404)
         serializer = PostringDetailSerializer(posting, context={'request' : request})
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
+
+    if (request.method == 'DELETE'):
+        try:
+            Posting.objects.get(pk=pk).delete()
+        except Posting.DoesNotExist:
+            return Response(None, status=404)
+        return Response(None, status=204)
 
 @csrf_exempt
 def posting_comments(request, pk):
@@ -52,6 +62,50 @@ def posting_comments(request, pk):
         serializer = CommentSerializer(comments, many=True)
         return JsonResponse(serializer.data, safe=False)
 
+
+@api_view(('GET', 'POST',))
+@permission_classes((permissions.AllowAny,))
+@csrf_exempt
+@renderer_classes((JSONRenderer,))
+def posting_rest(request):
+    #pageCount = Posting.objects.count()
+    print('posting_rest')
+    if (request.method == 'GET'):
+        index = 0; pagesize = mysite.settings.REST_FRAMEWORK['PAGE_SIZE']; start = 0;
+        try:
+            index = int(request.GET.urlencode().split('=')[1])
+        except IndexError:
+            pass
+        else:
+            pagesize = mysite.settings.REST_FRAMEWORK['PAGE_SIZE']
+            start = ((index - 1) * pagesize)
+
+        postings = Posting.objects.all()[start:start + pagesize]
+        # TODO Exception Handling
+        postinglist = []
+        fields_order = ['id', 'title', 'name', 'create_date',];
+        for posting in postings:
+            postingdict = model_to_dict(posting, \
+                fields=fields_order)
+            new_dic = {}
+            for field in fields_order:
+                new_dic[field] = postingdict[field];
+            #print(new_dic)
+            posting_dict = new_dic
+            postingdict['create_date'] = postingdict['create_date'].strftime('%Y-%m-%d %H:%M')
+            comment_count = posting.comment_set.count()
+            postingdict['comment_count'] = comment_count
+            postingdict['url'] = '/api/postings/' + str(postingdict['id'])
+            postinglist.append(postingdict)
+
+        return Response({'results' : postinglist})
+    if (request.method == 'POST'):
+        data= request.data
+        try:
+            Posting.objects.create(name=data['name'], title=data['title'], text=data['text'])
+        except IntegrityError:
+            Response(request.data, status=500)
+        return Response(request.data)
 
 @api_view(('GET',))
 @permission_classes((permissions.AllowAny,))

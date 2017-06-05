@@ -27,10 +27,12 @@ router.register(r'comments', board_views.CommentViewSet)
 
 urlpatterns = [
     url(r'^api/postings/count/$', board_views.postings_pagecount),
-    url(r'^api/postings/(?P<pk>\d+)/$', board_views.posting_detail),
+    url(r'^api/postings/(?P<pk>\d+)/$', board_views.posting_with_pk),
     url(r'^api/postings/(?P<pk>\d+)/comments/$', board_views.posting_comments),
+    url(r'^api/postings/$', board_views.posting_rest),
     url(r'^api/', include(router.urls)),
     url(r'^admin/', admin.site.urls),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^board/$', board_views.BoardView.as_view()),
+    url(r'^$', board_views.BoardView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

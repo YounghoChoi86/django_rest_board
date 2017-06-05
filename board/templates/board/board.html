@@ -13,19 +13,21 @@
 
 <title> 취미 코딩 게시판 </title>
 </head>
-<div class="pos-f-t">
-<div class="collapse" id="navbarToggleExternalContent">
-  <div class="bg-inverse p-4">
-    <h4 class="text-white"><a href='/board'>게시판</a></h4>
+  <div class="pos-f-t">
+    <div class="collapse" id="navbarToggleExternalContent">
+      <div class="bg-inverse p-4">
+        <h4 class="text-white"><a href='/board'>게시판</a></h4>
+      </div>
+    </div>
+    <nav class="navbar navbar-inverse bg-inverse">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    </nav>
   </div>
-</div>
-<nav class="navbar navbar-inverse bg-inverse">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-</nav>
-</div>
-
+  <center>
+  <h2> 모두의 게시판 </h2>
+  </center>
   <center>
   <div id='posting-detail' style="width:50%">
   </div>
@@ -36,8 +38,12 @@
   </table>
   </div>
 
+  <div style='width:70%;'>
+    <form id="write-form">
+    </form>
+  </div>
   <div align='right' style='width:70%;'>
-    <button class="btn btn-primary">글작성</button>
+    <button class="btn btn-primary" onclick="javascript:makeWriteForm()">글작성</button>
   </div>
   <div>
   <ul id="page" class="pagination justify-content-center">
